@@ -22,17 +22,29 @@ function debug() {
 
 # Determine the absolute path of the current script
 SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+debug "SOURCE=$SOURCE"
+# if we're in a /proc/self/fd/N directory, skip all this
+if [[ "$SOURCE" =~ ^/proc/self/fd/.* ]]; then
+	debug "Skipping dependency management in a procfs directory"
+	RUNTIME_DIR=/nonexistent
+else
+	while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+		DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+		SOURCE="$(readlink "$SOURCE")"
+		[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+	done
 	DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-	SOURCE="$(readlink "$SOURCE")"
-	[[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-RUNTIME_DIR=$DIR
+	RUNTIME_DIR=$DIR
+fi
+
 IMPORTS=( "common.sh" "inquirer.sh" )
 function check_imports() {
 	local dir=$1
+	if [ ! -d $dir ]; then
+		debug "Missing $dir"
+		return 1
+	fi
 	for import in "${IMPORTS[@]}"; do
 		debug "Checking $dir/$import"
 		if [ ! -f $dir/$import ]; then
@@ -105,4 +117,4 @@ debug "RUNTIME_DIR=$RUNTIME_DIR"
 cd $RUNTIME_DIR/templates
 debug "$(pwd) $PWD"
 debug "ls=$(ls)"
-. ./init.sh
+source ./init.sh
