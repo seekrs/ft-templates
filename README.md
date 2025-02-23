@@ -19,7 +19,7 @@ curl -sSL init.seekrs.top | sh
 Some experimental/highly-specific templates aren't displayed by default, you can see them by running:
 
 ```sh
-curl -sSL init.seekrs.top | FTT_SHOW_ALL=1 sh -s
+curl -sSL init.seekrs.top | FTT_SHOW_ALL=1 sh
 ```
 
 ## License

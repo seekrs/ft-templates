@@ -100,5 +100,9 @@ FTT_SHOW_ALL=${FTT_SHOW_ALL:-0}
 # fi
 
 FTT_PWD=$(pwd)
+debug "FTT_PWD=$FTT_PWD"
+debug "RUNTIME_DIR=$RUNTIME_DIR"
 cd $RUNTIME_DIR/templates
+debug "$(pwd)"
+debug "ls=$(ls)"
 source init.sh
