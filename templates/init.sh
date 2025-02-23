@@ -2,7 +2,7 @@
 
 debug "Balling templates"
 
-if [ $FTT_FULL_LIST -eq 0 ]; then
+if [ $FTT_SHOW_ALL -eq 0 ]; then
 	templates=($(for t in $(\ls -1 --hide='*.sh'); do if [ -f $t/.common-template ]; then echo $t; fi; done))
 else
 	templates=($(\ls -1 --hide='*.sh'))

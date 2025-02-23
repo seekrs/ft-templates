@@ -80,9 +80,9 @@ echo
 log "Welcome to $FTT_NAME $FTT_VERSION"
 echo
 
-FTT_FULL_LIST=${FTT_FULL_LIST:-0}
-# if [ $FTT_FULL_LIST -eq 1 ]; then
-# 	log "Showing all templates because FTT_FULL_LIST is set to 1"
+FTT_SHOW_ALL=${FTT_SHOW_ALL:-0}
+# if [ $FTT_SHOW_ALL -eq 1 ]; then
+# 	log "Showing all templates because FTT_SHOW_ALL is set to 1"
 # else
 # 	log "By default, only the most common templates will be shown."
 # 	log "This should be enough for most users, and is the recommended default."
@@ -91,7 +91,7 @@ FTT_FULL_LIST=${FTT_FULL_LIST:-0}
 # 	list_input "Do you want to show the full template list?" choices resp
 #
 # 	if [ "$resp" = "Yes" ]; then
-# 		FTT_FULL_LIST=1
+# 		FTT_SHOW_ALL=1
 # 	fi
 # fi
 
