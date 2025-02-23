@@ -75,11 +75,23 @@ if ! check_imports $RUNTIME_DIR/runtime; then
 			echo "!> git is required to download runtime dependencies"
 			exit 1
 		fi
-		git clone $FTT_REPO_URL $RUNTIME_DIR
-		git -C $RUNTIME_DIR checkout $FTT_BRANCH
+		git clone $FTT_REPO_URL $RUNTIME_DIR >/dev/null
+		if [ $? -ne 0 ]; then
+			echo "!> Failed to clone runtime dependencies"
+			exit 1
+		fi
+		git -C $RUNTIME_DIR checkout $FTT_BRANCH >/dev/null
+		if [ $? -ne 0 ]; then
+			echo "!> Failed to checkout runtime dependencies"
+			exit 1
+		fi
 	else
 		debug "Checking for updates"
-		git -C $RUNTIME_DIR pull
+		git -C $RUNTIME_DIR pull --ff-only >/dev/null
+		if [ $? -ne 0 ]; then
+			echo "!> Failed to update runtime"
+			exit 1
+		fi
 	fi
 fi
 
