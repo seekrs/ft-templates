@@ -105,4 +105,4 @@ debug "RUNTIME_DIR=$RUNTIME_DIR"
 cd $RUNTIME_DIR/templates
 debug "$(pwd) $PWD"
 debug "ls=$(ls)"
-. init.sh
+. ./init.sh
