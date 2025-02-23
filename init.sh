@@ -4,7 +4,7 @@ set -eo pipefail
 
 FTT_NAME="ft-templates"
 FTT_VERSION="0.0.1-indev"
-if command -v git >/dev/null 2>&1; then
+if command -v git >/dev/null 2>&1 && [ -d .git ]; then
 	FTT_VERSION="$FTT_VERSION+$(git describe --tags --always --dirty)"
 fi
 FTT_REPO="seekrs/ft-templates"
