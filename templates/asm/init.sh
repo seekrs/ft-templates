@@ -1,0 +1,1 @@
+log "ASM template init"
