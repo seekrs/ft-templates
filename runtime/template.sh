@@ -35,6 +35,27 @@ function template_install() {
 	done
 }
 
+function add_library() {
+	local libName=$1
+	local libUrlVar=${libName}_URL
+	local libUrl
+	eval libUrl=\$$libUrlVar
+	[ -z "$libUrl" ] && error "No URL for $libName" && return
+	mkdir -p third-party
+
+	if [ -d $libName ]; then
+		warn "Library $libName already exists, skipping"
+		return
+	fi
+
+	if [ $FTT_USES_GIT -eq 1 ]; then
+		git submodule add $libUrl third-party/$libName
+	else
+		git clone --recursive $libUrl third-party/$libName
+		find third-party/$libName -name ".git" -exec rm -rf {} \; 2>/dev/null || true
+	fi
+}
+
 function template_variant_picker() {
 	variants=($(\ls -1 --hide='*.sh'))
 	list_input "Pick a variant:" variants resp

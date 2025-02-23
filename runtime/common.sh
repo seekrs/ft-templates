@@ -78,7 +78,7 @@ function ask_libft_url() {
 
 #TODO: ft-cli integration w/ login, team-id?
 function write_ftproject() {
-	cat > $FTPROJECT_FILE <<-EOF
+	cat > ftproject.toml <<-EOF
 		[project]
 		id = "$PROJECT_ID"
 	EOF
@@ -87,8 +87,10 @@ function write_ftproject() {
 function initialize_git() {
 	yn=( "Yes" "No" )
 	list_input "Do you want to create a git repository and commit the changes?" yn resp
+	FTT_USES_GIT=0
 
 	if [[ $resp == "Yes" ]]; then
+		FTT_USES_GIT=1
 		if [ ! -d .git ]; then
 			git init
 		fi

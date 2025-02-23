@@ -37,9 +37,9 @@ SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))
 OBJS := $(addprefix $(OBJ_DIR)/,$(OBJS))
 
 LIB_DIR := third-party
-LIBRARIES := {{LIBRARIES}}
 {{#LIBRARIES}}
-{{.}}_URL := {{(. _URL)}}
+LIBRARIES += {{.}}
+{{.}}_URL := {{(. '_URL')}}
 {{.}}_DIR := $(LIB_DIR)/{{.}}
 CFLAGS += -I$({{.}}_DIR)/include -I$({{.}}_DIR)/includes
 LDFLAGS += $({{.}}_DIR)/{{(. _LIB)}}

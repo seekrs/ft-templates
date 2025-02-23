@@ -44,7 +44,8 @@ cd $FTT_PWD
 
 [ $GENSOURCES -eq 0 ] && rm -rf gensources.sh
 [ $NIX_SHELL -eq 0 ] && rm -rf {shell,flake}.nix .envrc
-
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 
 initialize_git
+for lib in $LIBRARIES; do add_library $lib; done
+[ $FTT_USES_GIT -eq 1 ] && git submodule update --init --recursive
