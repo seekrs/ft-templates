@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -eo pipefail
+
 FTT_NAME="ft-templates"
 FTT_VERSION="0.0.1-indev"
 if command -v git >/dev/null 2>&1 && [ -d .git ]; then
@@ -10,6 +12,24 @@ FTT_REPO_URL="https://github.com/$FTT_REPO"
 FTT_BRANCH="main"
 DEBUG=${DEBUG:-0}
 
+# https://stackoverflow.com/a/28776166
+sourced=0
+if [ -n "$ZSH_VERSION" ]; then 
+	case $ZSH_EVAL_CONTEXT in *:file) sourced=1;; esac
+elif [ -n "$KSH_VERSION" ]; then
+	[ "$(cd -- "$(dirname -- "$0")" && pwd -P)/$(basename -- "$0")" != "$(cd -- "$(dirname -- "${.sh.file}")" && pwd -P)/$(basename -- "${.sh.file}")" ] && sourced=1
+elif [ -n "$BASH_VERSION" ]; then
+	(return 0 2>/dev/null) && sourced=1 
+else # All other shells: examine $0 for known shell binary filenames.
+	 # Detects `sh` and `dash`; add additional shell filenames as needed.
+	case ${0##*/} in sh|-sh|dash|-dash) sourced=1;; esac
+fi
+
+if [ $sourced -eq 1 ]; then
+	echo "!!!> This script should not be sourced, run it directly"
+	return 1
+fi
+
 function debug() {
 	if [ $DEBUG -eq 1 ]; then
 		echo "?> $1"
@@ -19,24 +39,7 @@ function debug() {
 function leave() {
 	debug "Leaving, exit code: $1"
 
-	# https://stackoverflow.com/a/28776166
-	sourced=0
-	if [ -n "$ZSH_VERSION" ]; then 
-		case $ZSH_EVAL_CONTEXT in *:file) sourced=1;; esac
-	elif [ -n "$KSH_VERSION" ]; then
-		[ "$(cd -- "$(dirname -- "$0")" && pwd -P)/$(basename -- "$0")" != "$(cd -- "$(dirname -- "${.sh.file}")" && pwd -P)/$(basename -- "${.sh.file}")" ] && sourced=1
-	elif [ -n "$BASH_VERSION" ]; then
-		(return 0 2>/dev/null) && sourced=1 
-	else # All other shells: examine $0 for known shell binary filenames.
-		 # Detects `sh` and `dash`; add additional shell filenames as needed.
-		case ${0##*/} in sh|-sh|dash|-dash) sourced=1;; esac
-	fi
-
-	if [ $sourced -eq 0 ]; then
-		exit $1
-	else
-		return $1
-	fi
+	exit $1
 }
 
 ### Dependency management
@@ -149,8 +152,8 @@ debug "FTT_PWD=$FTT_PWD"
 debug "RUNTIME_DIR=$RUNTIME_DIR"
 
 if [[ "$FTT_PWD" == "$RUNTIME_DIR" ]]; then
-	log "Looks like you're running this script from the runtime directory, which is not recommended."
-	log "You should specify another directory to use as the project root."
+	warn "Looks like you're running this script from the runtime directory, which is not recommended."
+	warn "You should specify another directory to use as the project root."
 	text_input "New project root:" resp
 	mkdir -vp $resp
 	echo
@@ -161,19 +164,32 @@ fi
 text_input "What's the name of your project?" resp
 PROJECT_NAME=$resp
 if [[ "x$PROJECT_NAME" == "x" ]]; then
-	log "Invalid project name"
+	error "Invalid project name"
 	leave 2
 fi
+
+if [ -d $PROJECT_NAME ]; then
+	error "Directory with that name already exists"
+	leave 2
+fi
+
 mkdir -vp $PROJECT_NAME
 cd $PROJECT_NAME
 FTT_PWD=$(pwd)
 debug "PROJECT_NAME=$PROJECT_NAME"
+
+trap "rm -rf $FTT_PWD" EXIT
+
+export PATH="$PATH:$RUNTIME_DIR/bin"
 
 cd $RUNTIME_DIR/templates
 # debug "$(pwd) $PWD"
 # debug "ls=$(ls)"
 source ./init.sh
 
-log "All done!"
+trap - EXIT
 
-cd $FTT_PWD
+log "All done!"
+echo
+
+log "You can run \`cd $FTT_PWD\` to get started!"
