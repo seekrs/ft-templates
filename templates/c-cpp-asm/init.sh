@@ -18,17 +18,18 @@ debug "GENSOURCES=$GENSOURCES"
 debug "FTPROJECT_TOML=$FTPROJECT_TOML"
 debug "NIX_SHELL=$NIX_SHELL"
 
-if [ $FTPROJECT_TOML -eq 1 ]; then
-	require_fzf
-	require_jq
-
-	jq '.[][0]' $RUNTIME_DIR/runtime/data/projects.json | xargs -I{} echo {} | fzf --prompt="Choose a project: " | read PROJECT_ID || error "Invalid project, aborted"
-fi
-
 LIBRARIES=""
 [ $USE_LIBFT -eq 1 ] && LIBRARIES+="libft " && ask_libft_url LIBFT_URL
 [ $USE_MACROLIBX -eq 1 ] && LIBRARIES+="MacroLibX "
 MACROLIBX_URL="https://github.com/seekrs/MacroLibX.git"
+
+if [ $FTPROJECT_TOML -eq 1 ]; then
+	require_fzf
+	require_jq
+
+	#TODO: json exists???
+	jq '.[][0]' $RUNTIME_DIR/runtime/data/projects.json | xargs -I{} echo {} | fzf --prompt="Choose a project: " | read PROJECT_ID || error "Invalid project, aborted"
+fi
 
 cd $TEMPLATE_DIR
 template_install LIBRARIES GENSOURCES LIBFT_URL MACROLIBX_URL
