@@ -32,7 +32,7 @@ fi
 
 function debug() {
 	if [ $DEBUG -eq 1 ]; then
-		echo "?> $1"
+		echo "?> $*" 1>&2
 	fi
 }
 

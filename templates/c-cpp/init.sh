@@ -4,17 +4,11 @@ PROJECT_PREFIX=$resp
 options=( "Automatic sources generation" "Mandatory/Common/Bonus sources split" "Nix development shell" "ftproject.toml" )
 checkbox_input "Select which features you want to use:" options resp
 
-debug "${resp[@]}"
 TEMPLATE_DIR=standard
-debug "What the fuck"
-[[ "$(opts_has resp "Mandatory/Common/Bonus sources split")" == "1" ]] && TEMPLATE_DIR=bonus-split
-debug "What the fuck"
+opts_has resp "Mandatory/Common/Bonus sources split" >/dev/null && TEMPLATE_DIR=bonus-split
 GENSOURCES=$(opts_has resp "Automatic sources generation")
-debug "What the fuck"
-FTPROJECT_TOML="$(opts_has resp "ftproject.toml")"
-debug "What the fuck"
-NIX_SHELL="$(opts_has resp "Nix development shell")"
-debug "What the fuck"
+FTPROJECT_TOML=$(opts_has resp "ftproject.toml")
+NIX_SHELL=$(opts_has resp "Nix development shell")
 
 debug "TEMPLATE_DIR=$TEMPLATE_DIR"
 debug "GENSOURCES=$GENSOURCES"

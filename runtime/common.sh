@@ -1,35 +1,39 @@
 #!/usr/bin/env false
 
 function log() {
-	echo "*> $*"
+	echo "*> $*" 1>&2
 }
 
 function warn() {
-	echo "!> $*"
+	echo "!> $*" 1>&2
 }
 
 function error() {
-	echo "!!!> $*"
+	echo "!!!> $*" 1>&2
 }
 
 function opts_has() {
 	local IFS=$'\n'
 	local _options
 	eval _options=( '"${'${1}'[@]}"' )
-	debug "options=${_options[@]}"
+	# debug "options=${_options[@]}"
 	local opt=$2
+	debug "target=$opt"
 	for o in ${_options[@]}; do
 		debug "o=$o"
 		if [ "$o" = "$opt" ]; then
 			debug "Found"
-			return "1"
+			echo "1"
+			return 0
 		fi
 	done
 	debug "Not found"
-	return "0"
+	echo "0"
+	return 1
 }
 
 function require_fzf() {
+	debug "Checking for fzf"
 	if ! command -v fzf >/dev/null 2>&1; then
 		if [ ! -f $RUNTIME_DIR/bin/fzf ]; then
 			warn "fzf is missing, installing it"
@@ -46,6 +50,7 @@ function require_fzf() {
 }
 
 function require_jq() {
+	debug "Checking for jq"
 	if ! command -v jq >/dev/null 2>&1; then
 		if [ ! -f $RUNTIME_DIR/bin/jq ]; then
 			warn "jq is missing, installing it"
