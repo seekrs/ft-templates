@@ -54,6 +54,10 @@ if ! check_imports $RUNTIME_DIR/runtime; then
 
 	if ! check_imports $RUNTIME_DIR/runtime; then
 		debug "Missing runtime dependencies at $RUNTIME_DIR, downloading them"
+		if [ -d $RUNTIME_DIR ]; then
+			debug "Removing existing runtime directory"
+			rm -rf $RUNTIME_DIR
+		fi
 		mkdir -p $RUNTIME_DIR
 		if ! command -v git >/dev/null 2>&1; then
 			echo "!> git is required to download runtime dependencies"
