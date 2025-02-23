@@ -12,6 +12,9 @@ function template_install_file() {
 function template_install() {
 	debug "Installing template $(pwd)"
 
+	local variables=$*
+	echo "Generating template with $variables"
+
 	if [ -z "$FTT_PWD" ]; then
 		echo "!> FTT_PWD is not set"
 		leave 1
@@ -42,4 +45,50 @@ function template_variant_picker() {
 	fi
 
 	return $resp
+}
+
+function generate_nix_files() {
+	echo "use flake" > .envrc
+	cat > flake.nix <<-EOF
+		{
+		  description = "$PROJECT_NAME";
+
+		  inputs = {
+			nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+			systems.url = "github:nix-systems/x86_64-linux";
+		  };
+
+		  outputs =
+			{ self, nixpkgs, ... }@inputs:
+			let
+			  inherit (self) outputs;
+			  systems = (import inputs.systems);
+			  forAllSystems = nixpkgs.lib.genAttrs systems;
+			in
+			{
+			  devShells = forAllSystems (
+				system:
+				{
+				  default = (import ./shell.nix) {
+					pkgs = import nixpkgs { inherit system; };
+				  };
+				}
+			  );
+			};
+		}
+	EOF
+
+	cat > shell.nix <<-EOF
+		{ pkgs ? import <nixpkgs> {} }:
+		let
+		  stdenv = pkgs.llvmPackages_20.stdenv;
+		in
+		(pkgs.mkShell.override { inherit stdenv; }) {
+		  nativeBuildInputs = with pkgs; [
+			nasm
+			valgrind
+			gdb
+		  ];
+		}
+	EOF
 }

@@ -24,12 +24,11 @@ function opts_has() {
 		if [ "$o" = "$opt" ]; then
 			debug "Found"
 			echo "1"
-			return 0
+			return
 		fi
 	done
 	debug "Not found"
 	echo "0"
-	return 1
 }
 
 function require_fzf() {
@@ -59,4 +58,20 @@ function require_jq() {
 			chmod +x $RUNTIME_DIR/bin/jq
 		fi
 	fi
+}
+
+function ask_libft_url() {
+	local file=$RUNTIME_DIR/libft.local
+	if [ -f $file ]; then
+		local contents=$(cat $file)
+		eval "$1=$contents"
+		log "Using cached libft URL: $contents"
+		return
+	fi
+
+	local libft_url
+	text_input "Enter your libft repository URL (HTTPS or SSH):" libft_url 
+	log "Saving libft URL to $file for next times"
+	echo $libft_url > $file
+	eval "$1=$libft_url"
 }

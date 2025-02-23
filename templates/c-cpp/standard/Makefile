@@ -1,1 +1,0 @@
-NAME := {{PROJECT_NAME}}

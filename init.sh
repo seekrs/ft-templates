@@ -62,7 +62,7 @@ else
 	RUNTIME_DIR=$DIR
 fi
 
-IMPORTS=( "common.sh" "inquirer.sh" "template.sh" )
+IMPORTS=( "common.sh" "inquirer.sh" "template.sh" "mo.sh" )
 function check_imports() {
 	local dir=$1
 	if [ ! -d $dir ]; then
