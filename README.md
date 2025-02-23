@@ -13,13 +13,13 @@ This is a collection of free/libre templates for kickstarting your next 42 proje
 This repository also provides a standalone interactive script; just run the following command to get started:
 
 ```sh
-curl -sSL init.seekrs.top | sh
+sh <(curl -sSL init.seekrs.top)
 ```
 
 Some experimental/highly-specific templates aren't displayed by default, you can see them by running:
 
 ```sh
-curl -sSL init.seekrs.top | FTT_SHOW_ALL=1 sh
+FTT_SHOW_ALL=1 sh <(curl -sSL init.seekrs.top)
 ```
 
 ## License
