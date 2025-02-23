@@ -5,8 +5,8 @@
 function template_install_file() {
 	local file=$1
 	local dest=$FTT_PWD/$file
-	install -m 644 $file $dest
-	log "Installed $file to $dest"
+	cat $file | mo > "$dest"
+	debug "Installed $file to $dest"
 }
 
 function template_install() {
@@ -20,7 +20,7 @@ function template_install() {
 		leave 1
 	fi
 
-	for file in $(\ls -1 --hide='*.sh'); do
+	for file in $(\ls -A1 --hide='*.sh'); do
 		if [ -f $file ]; then
 			template_install_file $file
 		else
@@ -45,50 +45,4 @@ function template_variant_picker() {
 	fi
 
 	return $resp
-}
-
-function generate_nix_files() {
-	echo "use flake" > .envrc
-	cat > flake.nix <<-EOF
-		{
-		  description = "$PROJECT_NAME";
-
-		  inputs = {
-			nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
-			systems.url = "github:nix-systems/x86_64-linux";
-		  };
-
-		  outputs =
-			{ self, nixpkgs, ... }@inputs:
-			let
-			  inherit (self) outputs;
-			  systems = (import inputs.systems);
-			  forAllSystems = nixpkgs.lib.genAttrs systems;
-			in
-			{
-			  devShells = forAllSystems (
-				system:
-				{
-				  default = (import ./shell.nix) {
-					pkgs = import nixpkgs { inherit system; };
-				  };
-				}
-			  );
-			};
-		}
-	EOF
-
-	cat > shell.nix <<-EOF
-		{ pkgs ? import <nixpkgs> {} }:
-		let
-		  stdenv = pkgs.llvmPackages_20.stdenv;
-		in
-		(pkgs.mkShell.override { inherit stdenv; }) {
-		  nativeBuildInputs = with pkgs; [
-			nasm
-			valgrind
-			gdb
-		  ];
-		}
-	EOF
 }

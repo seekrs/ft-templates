@@ -75,3 +75,29 @@ function ask_libft_url() {
 	echo $libft_url > $file
 	eval "$1=$libft_url"
 }
+
+#TODO: ft-cli integration w/ login, team-id?
+function write_ftproject() {
+	cat > $FTPROJECT_FILE <<-EOF
+		[project]
+		id = "$PROJECT_ID"
+	EOF
+}
+
+function initialize_git() {
+	yn=( "Yes" "No" )
+	list_input "Do you want to create a git repository and commit the changes?" yn resp
+
+	if [[ $resp == "Yes" ]]; then
+		if [ ! -d .git ]; then
+			git init
+		fi
+		git add .
+		#TODO: ft commit? lol
+		if command -v qit >/dev/null 2>&1; then
+			qit commit feature "initial commit"
+		else
+			git commit -m "Initial commit"
+		fi
+	fi
+}

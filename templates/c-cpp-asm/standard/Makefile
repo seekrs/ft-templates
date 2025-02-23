@@ -2,6 +2,14 @@
 # https://github.com/seekrs/ft-templates
 
 NAME := {{PROJECT_NAME}}
+-include development.mk
+
+ifeq ($(DEVELOPMENT), 1)
+DEBUG := 1
+{{#GENSOURCES}}
+_ := $(shell bash gensources.sh sources.mk $(SRC_DIR))
+{{/GENSOURCES}}
+endif
 
 DEBUG ?= 0
 BONUS ?= 0
@@ -17,15 +25,6 @@ SRC_DIR := src
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
-{{#GENSOURCES}}
--include development.mk
-
-ifeq ($(DEVELOPMENT), 1)
-DEBUG := 1
-_ := $(shell bash gensources.sh $(SRC_DIR))
-endif
-{{/GENSOURCES}}
-
 ifeq ($(DEBUG), 1)
 CFLAGS += -g3 -gdwarf-3 -ggdb
 NASMFLAGS += -g
@@ -36,6 +35,15 @@ include sources.mk
 OBJS := $(patsubst %.c,%.o,$(patsubst %.s,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
 SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))
 OBJS := $(addprefix $(OBJ_DIR)/,$(OBJS))
+
+LIB_DIR := third-party
+LIBRARIES := {{LIBRARIES}}
+{{#LIBRARIES}}
+{{.}}_URL := {{(. _URL)}}
+{{.}}_DIR := $(LIB_DIR)/{{.}}
+CFLAGS += -I$({{.}}_DIR)/include -I$({{.}}_DIR)/includes
+LDFLAGS += $({{.}}_DIR)/{{(. _LIB)}}
+{{/LIBRARIES}}
 
 all: $(NAME)
 

@@ -1,0 +1,6 @@
+*.o
+*.a
+*.out
+/{{PROJECT_NAME}}
+.direnv/
+*.swp
