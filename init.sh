@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
-
 FTT_NAME="ft-templates"
 FTT_VERSION="0.0.1-indev"
 if command -v git >/dev/null 2>&1 && [ -d .git ]; then
@@ -15,6 +13,29 @@ DEBUG=${DEBUG:-0}
 function debug() {
 	if [ $DEBUG -eq 1 ]; then
 		echo "?> $1"
+	fi
+}
+
+function leave() {
+	debug "Leaving, exit code: $1"
+
+	# https://stackoverflow.com/a/28776166
+	sourced=0
+	if [ -n "$ZSH_VERSION" ]; then 
+		case $ZSH_EVAL_CONTEXT in *:file) sourced=1;; esac
+	elif [ -n "$KSH_VERSION" ]; then
+		[ "$(cd -- "$(dirname -- "$0")" && pwd -P)/$(basename -- "$0")" != "$(cd -- "$(dirname -- "${.sh.file}")" && pwd -P)/$(basename -- "${.sh.file}")" ] && sourced=1
+	elif [ -n "$BASH_VERSION" ]; then
+		(return 0 2>/dev/null) && sourced=1 
+	else # All other shells: examine $0 for known shell binary filenames.
+		 # Detects `sh` and `dash`; add additional shell filenames as needed.
+		case ${0##*/} in sh|-sh|dash|-dash) sourced=1;; esac
+	fi
+
+	if [ $sourced -eq 0 ]; then
+		exit $1
+	else
+		return $1
 	fi
 }
 
@@ -38,7 +59,7 @@ else
 	RUNTIME_DIR=$DIR
 fi
 
-IMPORTS=( "common.sh" "inquirer.sh" )
+IMPORTS=( "common.sh" "inquirer.sh" "template.sh" )
 function check_imports() {
 	local dir=$1
 	if [ ! -d $dir ]; then
@@ -73,24 +94,24 @@ if ! check_imports $RUNTIME_DIR/runtime; then
 		mkdir -p $RUNTIME_DIR
 		if ! command -v git >/dev/null 2>&1; then
 			echo "!> git is required to download runtime dependencies"
-			exit 1
+			leave 1
 		fi
 		git clone $FTT_REPO_URL $RUNTIME_DIR >/dev/null
 		if [ $? -ne 0 ]; then
 			echo "!> Failed to clone runtime dependencies"
-			exit 1
+			leave 1
 		fi
 		git -C $RUNTIME_DIR checkout $FTT_BRANCH >/dev/null
 		if [ $? -ne 0 ]; then
 			echo "!> Failed to checkout runtime dependencies"
-			exit 1
+			leave 1
 		fi
 	else
 		debug "Checking for updates"
 		git -C $RUNTIME_DIR pull --ff-only >/dev/null
 		if [ $? -ne 0 ]; then
 			echo "!> Failed to update runtime"
-			exit 1
+			leave 1
 		fi
 	fi
 fi
@@ -126,7 +147,33 @@ FTT_SHOW_ALL=${FTT_SHOW_ALL:-0}
 FTT_PWD=$(pwd)
 debug "FTT_PWD=$FTT_PWD"
 debug "RUNTIME_DIR=$RUNTIME_DIR"
+
+if [[ "$FTT_PWD" == "$RUNTIME_DIR" ]]; then
+	log "Looks like you're running this script from the runtime directory, which is not recommended."
+	log "You should specify another directory to use as the project root."
+	text_input "New project root:" resp
+	mkdir -vp $resp
+	echo
+	cd $resp
+	FTT_PWD=$(pwd)
+fi
+
+text_input "What's the name of your project?" resp
+PROJECT_NAME=$resp
+if [[ "x$PROJECT_NAME" == "x" ]]; then
+	log "Invalid project name"
+	leave 2
+fi
+mkdir -vp $PROJECT_NAME
+cd $PROJECT_NAME
+FTT_PWD=$(pwd)
+debug "PROJECT_NAME=$PROJECT_NAME"
+
 cd $RUNTIME_DIR/templates
-debug "$(pwd) $PWD"
-debug "ls=$(ls)"
+# debug "$(pwd) $PWD"
+# debug "ls=$(ls)"
 source ./init.sh
+
+log "All done!"
+
+cd $FTT_PWD

@@ -1,7 +1,5 @@
 #!/usr/bin/env false
 
-debug "Balling templates"
-
 if [ $FTT_SHOW_ALL -eq 0 ]; then
 	templates=($(for t in $(\ls -1 --hide='*.sh'); do if [ -f $t/.common-template ]; then echo $t; fi; done))
 else
@@ -12,9 +10,10 @@ list_input "Which template would you like to use?" templates resp
 
 if [ ! -d $resp ]; then
 	echo "Invalid template"
-	exit 1
+	leave 1
 fi
 
 TEMPLATE_NAME=$resp
-cd $resp
-source init.sh
+debug "TEMPLATE_NAME=$TEMPLATE_NAME"
+cd $TEMPLATE_NAME
+source ./init.sh
