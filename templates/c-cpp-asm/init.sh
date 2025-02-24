@@ -36,13 +36,14 @@ if [ $FTPROJECT_TOML -eq 1 ]; then
 
 	#TODO: json exists???
 	jq '.[][0]' $RUNTIME_DIR/runtime/data/projects.json | xargs -I{} echo {} | fzf --prompt="Choose a project: " | read PROJECT_ID || error "Invalid project, aborted"
+	debug "PROJECT_ID=$PROJECT_ID"
 fi
 
 cd $TEMPLATE_DIR
 template_install LIBRARIES GENSOURCES LIBFT_URL MACROLIBX_URL
 cd $FTT_PWD
 
-[ $GENSOURCES -eq 0 ] && rm -rf gensources.sh
+[ $GENSOURCES ] && bash gensources.sh || rm -rf gensources.sh
 [ $NIX_SHELL -eq 0 ] && rm -rf {shell,flake}.nix .envrc
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 
