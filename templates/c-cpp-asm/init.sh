@@ -19,8 +19,8 @@ debug "FTPROJECT_TOML=$FTPROJECT_TOML"
 debug "NIX_SHELL=$NIX_SHELL"
 
 LIBRARIES=""
-[ $USE_LIBFT -eq 1 ] && LIBRARIES+="libft " && ask_libft_url libft_URL && libft_LIB=libft.a
-[ $USE_MACROLIBX -eq 1 ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so
+[ $USE_LIBFT ] && LIBRARIES+="libft " && ask_libft_url libft_URL && libft_LIB=libft.a
+[ $USE_MACROLIBX ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so
 LIBRARIES=( $LIBRARIES )
 for lib in $LIBRARIES; do
 	debug "lib='$lib'"
@@ -30,13 +30,21 @@ debug "LIBRARIES=$LIBRARIES"
 debug "LIBFT_URL=$libft_URL"
 debug "MacroLibX_URL=$MacroLibX_URL"
 
-if [ $FTPROJECT_TOML -eq 1 ]; then
+if [ $FTPROJECT_TOML ]; then
 	require_fzf
 	require_jq
 
-	#TODO: json exists???
-	jq '.[][0]' $RUNTIME_DIR/runtime/data/projects.json | xargs -I{} echo {} | fzf --prompt="Choose a project: " | read PROJECT_ID || error "Invalid project, aborted"
-	debug "PROJECT_ID=$PROJECT_ID"
+	JSON_FILE=$RUNTIME_DIR/runtime/data/projects.json
+	#TODO: try and fetch json into cache first
+	#[ ! -f $JSON_FILE && require_ft_cli ] && mkdir -p $(dirname $JSON_FILE) && ft projects --all --json > $RUNTIME_DIR/runtime/data/projects.json
+
+	if [ ! -f $JSON_FILE ]; then
+		warn "Could not find 42 projects.json, cannot generate ftproject.toml"
+		FTPROJECT_TOML=0
+	else
+		jq '.[][0]' $JSON_FILE | xargs -I{} echo {} | fzf --prompt="Choose a 42 project id: " --height=12 | read PROJECT_ID || error "Invalid project, aborted"
+		debug "PROJECT_ID=$PROJECT_ID"
+	fi
 fi
 
 cd $TEMPLATE_DIR
@@ -44,9 +52,9 @@ template_install LIBRARIES GENSOURCES LIBFT_URL MACROLIBX_URL
 cd $FTT_PWD
 
 [ $GENSOURCES ] && bash gensources.sh || rm -rf gensources.sh
-[ $NIX_SHELL -eq 0 ] && rm -rf {shell,flake}.nix .envrc
-[ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
+[ $NIX_SHELL ] || rm -rf {shell,flake}.nix .envrc
+[ $FTPROJECT_TOML ] && write_ftproject 
 
 initialize_git
 for lib in $LIBRARIES; do add_library $lib; done
-[ $FTT_USES_GIT -eq 1 ] && git submodule update --init --recursive
+[ $FTT_USES_GIT ] && git submodule update --init --recursive

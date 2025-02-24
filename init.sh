@@ -3,7 +3,7 @@
 set -eo pipefail
 
 FTT_NAME="ft-templates"
-FTT_VERSION="0.0.4-indev"
+FTT_VERSION="0.0.6-indev"
 FTT_REPO="seekrs/ft-templates"
 FTT_REPO_URL="https://github.com/$FTT_REPO"
 FTT_BRANCH="main"
@@ -189,4 +189,6 @@ trap - EXIT
 log "All done!"
 echo
 
-log "You can run \`cd $FTT_PWD\` to get started!"
+log "Run the following command to get started:"
+echo "cd $FTT_PWD"
+echo

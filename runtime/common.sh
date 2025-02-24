@@ -45,7 +45,7 @@ function require_fzf() {
 			rm -rf $tmpdir
 		fi
 	fi
-	export FZF_DEFAULT_OPTS="--height 100% --reverse --border --prompt='> '"
+	export FZF_DEFAULT_OPTS="--reverse --border --prompt='> '"
 }
 
 function require_jq() {
