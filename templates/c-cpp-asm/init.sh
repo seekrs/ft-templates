@@ -7,12 +7,13 @@ checkbox_input "Select which features you want to use:" options resp
 USE_LIBFT=$(opts_has resp "Use libft")
 USE_MACROLIBX=$(opts_has resp "Use MacroLibX")
 TEMPLATE_DIR=standard
-[[ $(opts_has resp "Mandatory/Common/Bonus sources split" >/dev/null) == "1" ]] && TEMPLATE_DIR=bonus-split
+# [[ $(opts_has resp "Mandatory/Common/Bonus sources split" >/dev/null) == "1" ]] && TEMPLATE_DIR=bonus-split
 GENSOURCES=$(opts_has resp "Automatic sources generation")
 FTPROJECT_TOML="$(opts_has resp "ftproject.toml")"
 NIX_SHELL="$(opts_has resp "Nix development shell")"
 
 debug "USE_LIBFT=$USE_LIBFT"
+debug "USE_MACROLIBX=$USE_MACROLIBX"
 debug "TEMPLATE_DIR=$TEMPLATE_DIR"
 debug "GENSOURCES=$GENSOURCES"
 debug "FTPROJECT_TOML=$FTPROJECT_TOML"
@@ -20,7 +21,7 @@ debug "NIX_SHELL=$NIX_SHELL"
 
 LIBRARIES=""
 [ $USE_LIBFT ] && LIBRARIES+="libft " && ask_libft_url libft_URL && libft_LIB=libft.a
-[ $USE_MACROLIBX ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so
+[ $USE_MACROLIBX ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
 LIBRARIES=( $LIBRARIES )
 for lib in $LIBRARIES; do
 	debug "lib='$lib'"
@@ -42,13 +43,13 @@ if [ $FTPROJECT_TOML ]; then
 		warn "Could not find 42 projects.json, cannot generate ftproject.toml"
 		FTPROJECT_TOML=0
 	else
-		jq '.[][0]' $JSON_FILE | xargs -I{} echo {} | fzf --prompt="Choose a 42 project id: " --height=12 | read PROJECT_ID || error "Invalid project, aborted"
+		export PROJECT_ID=$(jq '.[][0]' $JSON_FILE | xargs -I{} echo {} | fzf --prompt="Choose a 42 project id: " --height=12)
 		debug "PROJECT_ID=$PROJECT_ID"
 	fi
 fi
 
 cd $TEMPLATE_DIR
-template_install LIBRARIES GENSOURCES LIBFT_URL MACROLIBX_URL
+template_install LIBRARIES GENSOURCES
 cd $FTT_PWD
 
 [ $GENSOURCES ] && bash gensources.sh || rm -rf gensources.sh
