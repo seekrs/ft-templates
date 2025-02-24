@@ -41,13 +41,15 @@ LIB_DIR := third-party
 LIBRARIES += {{.}}
 {{.}}_URL := {{(. '_URL')}}
 {{.}}_DIR := $(LIB_DIR)/{{.}}
+{{.}}_DEP := $({{.}}_DIR)/{{(. '_LIB')}}
 CFLAGS += -I$({{.}}_DIR)/include -I$({{.}}_DIR)/includes
-LDFLAGS += $({{.}}_DIR)/{{(. _LIB)}}
+LDFLAGS += $({{.}}_DEP)
+DEPFILES += $({{.}}_DEP)
 {{/LIBRARIES}}
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) $(DEPFILES)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
@@ -62,14 +64,25 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+{{#LIBRARIES}}
+$({{.}}_DEP):
+	make -C $({{.}}_DIR) -j$(shell nproc)
+{{/LIBRARIES}}
+
 oclean:
 	rm -rf $(BUILD_DIR)
 
-clean: oclean $(CLEANDEPS)
+clean: oclean
+{{#LIBRARIES}}
+	make -C $({{.}}_DIR) clean
+{{/LIBRARIES}}
 
-fclean: oclean $(FCLEANDEPS)
+fclean: oclean
+{{#LIBRARIES}}
+	make -C $({{.}}_DIR) fclean
+{{/LIBRARIES}}
 	rm -rf $(NAME)
 
 re: fclean all
 
-.PHONY: all clean oclean fclean re $(FCLEANDEPS) $(CLEANDEPS)
+.PHONY: all clean oclean fclean re
