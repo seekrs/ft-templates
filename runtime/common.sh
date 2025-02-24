@@ -87,10 +87,10 @@ function write_ftproject() {
 function initialize_git() {
 	yn=( "Yes" "No" )
 	list_input "Do you want to create a git repository and commit the changes?" yn resp
-	FTT_USES_GIT=0
+	export FTT_USES_GIT=0
 
 	if [[ $resp == "Yes" ]]; then
-		FTT_USES_GIT=1
+		export FTT_USES_GIT=1
 		if [ ! -d .git ]; then
 			git init
 		fi
