@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-SRCS_MK=${1:-srcs.mk}
+SRCS_MK=${1:-sources.mk}
 shift
 SRC_DIRS=$*
 if [ -z "$SRC_DIRS" ]; then
