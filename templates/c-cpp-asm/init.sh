@@ -20,8 +20,8 @@ debug "FTPROJECT_TOML=$FTPROJECT_TOML"
 debug "NIX_SHELL=$NIX_SHELL"
 
 LIBRARIES=""
-[ $USE_LIBFT ] && LIBRARIES+="libft " && ask_libft_url libft_URL && libft_LIB=libft.a
-[ $USE_MACROLIBX ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
+[ $USE_LIBFT -eq 1 ] && LIBRARIES+="libft " && ask_libft_url libft_URL && libft_LIB=libft.a
+[ $USE_MACROLIBX -eq 1 ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
 LIBRARIES=( $LIBRARIES )
 for lib in $LIBRARIES; do
 	debug "lib='$lib'"
@@ -31,7 +31,7 @@ debug "LIBRARIES=$LIBRARIES"
 debug "LIBFT_URL=$libft_URL"
 debug "MacroLibX_URL=$MacroLibX_URL"
 
-if [ $FTPROJECT_TOML ]; then
+if [ $FTPROJECT_TOML -eq 1 ]; then
 	require_fzf
 	require_jq
 
@@ -52,10 +52,10 @@ cd $TEMPLATE_DIR
 template_install LIBRARIES GENSOURCES
 cd $FTT_PWD
 
-[ $GENSOURCES ] && bash gensources.sh || rm -rf gensources.sh
-[ $NIX_SHELL ] || rm -rf {shell,flake}.nix .envrc
-[ $FTPROJECT_TOML ] && write_ftproject 
+[ $GENSOURCES -eq 1 ] && bash gensources.sh || rm -rf gensources.sh
+[ $NIX_SHELL -eq 1 ] || rm -rf {shell,flake}.nix .envrc
+[ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 
 initialize_git
 for lib in $LIBRARIES; do add_library $lib; done
-[ $FTT_USES_GIT ] && git submodule update --init --recursive
+[ $FTT_USES_GIT -eq 1 ] && git submodule update --init --recursive
