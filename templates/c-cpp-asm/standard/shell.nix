@@ -7,7 +7,9 @@ in
     nasm
     valgrind
     gdb
+{{#USE_MACROLIBX}}
     SDL2
     xorg.libX11
+{{/USE_MACROLIBX}}
   ];
 }

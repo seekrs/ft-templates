@@ -66,8 +66,8 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
-
 {{#LIBRARIES}}
+
 $({{.}}_DEP):
 	make -C $({{.}}_DIR) -j$(shell nproc)
 {{/LIBRARIES}}

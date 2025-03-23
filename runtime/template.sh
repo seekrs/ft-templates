@@ -12,9 +12,6 @@ function template_install_file() {
 function template_install() {
 	debug "Installing template $(pwd)"
 
-	local variables=$*
-	echo "Generating template with $variables"
-
 	if [ -z "$FTT_PWD" ]; then
 		echo "!> FTT_PWD is not set"
 		leave 1

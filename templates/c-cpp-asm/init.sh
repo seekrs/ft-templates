@@ -1,9 +1,10 @@
 text_input "Give a small prefix for project headers or namespace (e.g. ft):" resp
 PROJECT_PREFIX=$resp
 
-options=( "Use libft" "Use MacroLibX" "Automatic sources generation" "Mandatory/Common/Bonus sources split" "Nix development shell" "ftproject.toml" )
+options=( "Add README & License" "Use libft" "Use MacroLibX" "Automatic sources generation" "Nix development shell" "ftproject.toml" )
 checkbox_input "Select which features you want to use:" options resp
 
+README_LICENSE=$(opts_has resp "Add README & License")
 USE_LIBFT=$(opts_has resp "Use libft")
 USE_MACROLIBX=$(opts_has resp "Use MacroLibX")
 TEMPLATE_DIR=standard
@@ -12,6 +13,7 @@ GENSOURCES=$(opts_has resp "Automatic sources generation")
 FTPROJECT_TOML="$(opts_has resp "ftproject.toml")"
 NIX_SHELL="$(opts_has resp "Nix development shell")"
 
+debug "README_LICENSE=$README_LICENSE"
 debug "USE_LIBFT=$USE_LIBFT"
 debug "USE_MACROLIBX=$USE_MACROLIBX"
 debug "TEMPLATE_DIR=$TEMPLATE_DIR"
@@ -28,11 +30,19 @@ for lib in ${LIBRARIES[@]}; do
 	debug "lib='$lib'"
 done
 
+[ $USE_LIBFT -eq 1 ] || unset USE_LIBFT
+[ $USE_MACROLIBX -eq 1 ] || unset USE_MACROLIBX
+
 debug "LIBRARIES=$LIBRARIES"
 debug "LIBFT_URL=$libft_URL"
 debug "MacroLibX_URL=$MacroLibX_URL"
 
-if [ $FTPROJECT_TOML -eq 1 ]; then
+ask_login FTLOGIN
+debug "FTLOGIN=$FTLOGIN"
+
+YEAR=$(date +%Y)
+
+if [ $FTPROJECT_TOML -eq 1 ] || [ $README_LICENSE -eq 1 ]; then
 	require_fzf
 	require_jq
 
@@ -41,7 +51,9 @@ if [ $FTPROJECT_TOML -eq 1 ]; then
 	#[ ! -f $JSON_FILE && require_ft_cli ] && mkdir -p $(dirname $JSON_FILE) && ft projects --all --json > $RUNTIME_DIR/runtime/data/projects.json
 
 	if [ ! -f $JSON_FILE ]; then
-		warn "Could not find 42 projects.json, cannot generate ftproject.toml"
+		if [ $FTPROJECT_TOML -eq 1 ]; then
+			warn "Could not find 42 projects.json, cannot generate ftproject.toml"
+		fi
 		FTPROJECT_TOML=0
 	else
 		export PROJECT_ID=$(jq '.[][0]' $JSON_FILE | xargs -I{} echo {} | fzf --prompt="Choose a 42 project id: " --height=12)
@@ -50,12 +62,13 @@ if [ $FTPROJECT_TOML -eq 1 ]; then
 fi
 
 cd $TEMPLATE_DIR
-template_install LIBRARIES GENSOURCES USE_MACROLIBX
+template_install
 cd $FTT_PWD
 
 [ $GENSOURCES -eq 1 ] && bash gensources.sh || rm -rf gensources.sh
 [ $NIX_SHELL -eq 1 ] || rm -rf {shell,flake}.nix .envrc
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
+[ $README_LICENSE -eq 1 ] || rm -rf LICENSE README.md
 
 initialize_git
 for lib in ${LIBRARIES[@]}; do add_library $lib; done

@@ -71,9 +71,35 @@ function ask_libft_url() {
 
 	local libft_url
 	text_input "Enter your libft repository URL (HTTPS or SSH):" libft_url 
-	log "Saving libft URL to $file for next times"
+	log "Saving libft URL to $file for next time"
 	echo $libft_url > $file
 	eval "$1=$libft_url"
+}
+
+function ask_login() {
+	local file=$RUNTIME_DIR/42login.local
+	if [ -f $file ]; then
+		local contents=$(cat $file)
+		eval "$1=$contents"
+		log "Using cached 42 login: $contents"
+		return
+	fi
+
+	if cat /etc/hostname | grep -q "42"; then
+		text_input "Is '$USER' your 42 login? (Y/n) " resp
+		if [[ $resp == "Y" ]] || [[ $resp == "y" ]] || [[ $resp == "" ]]; then
+			local ftlogin=$USER
+			echo $ftlogin > $file
+			eval "$1=$ftlogin"
+			return
+		fi
+	fi
+
+	local ftlogin
+	text_input "Enter your 42 login:" ftlogin 
+	log "Saving 42 login to $file for next time"
+	echo $ftlogin > $file
+	eval "$1=$ftlogin"
 }
 
 #TODO: ft-cli integration w/ login, team-id?
