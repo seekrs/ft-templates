@@ -59,4 +59,12 @@ cd $FTT_PWD
 
 initialize_git
 for lib in ${LIBRARIES[@]}; do add_library $lib; done
-[ $FTT_USES_GIT -eq 1 ] && git submodule update --init --recursive
+if [ $FTT_USES_GIT -eq 1 ]; then
+	git submodule update --init --recursive
+	if command -v qit >/dev/null 2>&1; then
+		qit commit deps "init dependencies"
+	else
+		git commit -m "Init dependencies"
+	fi
+fi
+
