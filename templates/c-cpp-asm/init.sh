@@ -19,12 +19,12 @@ debug "GENSOURCES=$GENSOURCES"
 debug "FTPROJECT_TOML=$FTPROJECT_TOML"
 debug "NIX_SHELL=$NIX_SHELL"
 
-LIBRARIES=""
-[ $USE_LIBFT -eq 1 ] && LIBRARIES+="libft " && ask_libft_url libft_URL && libft_LIB=libft.a
-[ $USE_MACROLIBX -eq 1 ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
+LIBRARIES=()
+[ $USE_LIBFT -eq 1 ] && LIBRARIES+=("libft") && ask_libft_url libft_URL && libft_LIB=libft.a && log "Added libft"
+[ "x$(id -nu)" == "xkiroussa" ] && libft_LIB=build/output/libft.a
+[ $USE_MACROLIBX -eq 1 ] && LIBRARIES+=("MacroLibX") && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
 debug "LIBRARIES=$LIBRARIES"
-# LIBRARIES=( $LIBRARIES )
-for lib in $LIBRARIES; do
+for lib in ${LIBRARIES[@]}; do
 	debug "lib='$lib'"
 done
 
@@ -58,5 +58,5 @@ cd $FTT_PWD
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 
 initialize_git
-for lib in $LIBRARIES; do add_library $lib; done
+for lib in ${LIBRARIES[@]}; do add_library $lib; done
 [ $FTT_USES_GIT -eq 1 ] && git submodule update --init --recursive
