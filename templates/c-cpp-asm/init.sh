@@ -22,7 +22,8 @@ debug "NIX_SHELL=$NIX_SHELL"
 LIBRARIES=""
 [ $USE_LIBFT -eq 1 ] && LIBRARIES+="libft " && ask_libft_url libft_URL && libft_LIB=libft.a
 [ $USE_MACROLIBX -eq 1 ] && LIBRARIES+="MacroLibX " && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
-LIBRARIES=( $LIBRARIES )
+debug "LIBRARIES=$LIBRARIES"
+# LIBRARIES=( $LIBRARIES )
 for lib in $LIBRARIES; do
 	debug "lib='$lib'"
 done
@@ -49,7 +50,7 @@ if [ $FTPROJECT_TOML -eq 1 ]; then
 fi
 
 cd $TEMPLATE_DIR
-template_install LIBRARIES GENSOURCES
+template_install LIBRARIES GENSOURCES USE_MACROLIBX
 cd $FTT_PWD
 
 [ $GENSOURCES -eq 1 ] && bash gensources.sh || rm -rf gensources.sh

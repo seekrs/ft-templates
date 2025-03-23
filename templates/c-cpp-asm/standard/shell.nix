@@ -7,5 +7,7 @@ in
     nasm
     valgrind
     gdb
+    SDL2
+    xorg.libX11
   ];
 }

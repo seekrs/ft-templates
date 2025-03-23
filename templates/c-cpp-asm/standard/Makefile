@@ -46,6 +46,9 @@ CFLAGS += -I$({{.}}_DIR)/include -I$({{.}}_DIR)/includes
 LDFLAGS += $({{.}}_DEP)
 DEPFILES += $({{.}}_DEP)
 {{/LIBRARIES}}
+{{#USE_MACROLIBX}}
+LDFLAGS += -lSDL2
+{{/USE_MACROLIBX}}
 
 all: $(NAME)
 
