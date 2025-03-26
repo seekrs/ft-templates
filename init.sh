@@ -3,7 +3,7 @@
 set -eo pipefail
 
 FTT_NAME="ft-templates"
-FTT_VERSION="0.0.8-indev"
+FTT_VERSION="0.0.9-indev"
 FTT_REPO="seekrs/ft-templates"
 FTT_REPO_URL="https://github.com/$FTT_REPO"
 FTT_BRANCH="main"
