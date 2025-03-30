@@ -56,7 +56,7 @@ if [ $FTPROJECT_TOML -eq 1 ] || [ $README_LICENSE -eq 1 ]; then
 		fi
 		FTPROJECT_TOML=0
 	else
-		export PROJECT_ID=$(jq '.[][0]' $JSON_FILE | xargs -I{} echo {} | fzf --prompt="Choose a 42 project id: " --height=12--query "$PROJECT_NAME")
+		export PROJECT_ID=$(jq '.[][0]' $JSON_FILE | xargs -I{} echo {} | fzf --prompt="Choose a 42 project id: " --height=12 --query "$PROJECT_NAME")
 		debug "PROJECT_ID=$PROJECT_ID"
 	fi
 fi
