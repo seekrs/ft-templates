@@ -54,7 +54,7 @@ cd $FTT_PWD
 [ $NIX_SHELL -eq 1 ] || rm -rf {shell,flake}.nix .envrc
 if [ $NIX_SHELL -eq 1 ]; then
 	if command -v direnv >/dev/null 2>&1; then
-		direnv allow
+		direnv allow $FTT_PWD
 	else
 		rm -f .envrc
 	fi
