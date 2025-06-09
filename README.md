@@ -14,11 +14,11 @@ This repository also provides a standalone interactive script; just run the foll
 bash <(curl -sSL init.seekrs.top)
 ```
 
-Some experimental/highly-specific/broken templates aren't displayed by default, you can see them by running:
-
-```sh
-FTT_SHOW_ALL=1 bash <(curl -sSL init.seekrs.top)
-```
+<!-- Some experimental/highly-specific/broken templates aren't displayed by default, you can see them by running: -->
+<!---->
+<!-- ```sh -->
+<!-- FTT_SHOW_ALL=1 bash <(curl -sSL init.seekrs.top) -->
+<!-- ``` -->
 
 ## License
 
