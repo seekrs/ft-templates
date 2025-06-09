@@ -8,7 +8,7 @@ This is a collection of free/libre templates for kickstarting your next 42 proje
 
 <!-- These templates can be used via [ft-cli](https://github.com/seekrs/ft-cli), using the `ft init` command. -->
 
-This repository also provides a standalone interactive script; just run the following command to get started:
+This repository provides a standalone interactive script; just run the following command to get started:
 
 ```sh
 bash <(curl -sSL init.seekrs.top)
