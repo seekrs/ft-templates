@@ -14,7 +14,6 @@ _ := $(shell bash gensources.sh sources.mk $(SRC_DIR))
 endif
 
 DEBUG ?= 0
-BONUS ?= 0
 
 CC := clang
 CXX := clang++
