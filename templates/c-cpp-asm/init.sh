@@ -1,4 +1,9 @@
-options=( "Add README & License" "Dependency: libft" "Dependency: MacroLibX" "Automatic sources generation" "clangd support" "Nix development shell" )
+options=( "Add README & License" "Dependency: libft" "Dependency: MacroLibX" "Automatic sources generation" "clangd support" )
+
+#TODO: maybe not check? unsure
+if command -v nix >/dev/null 2>&1; then
+	options+=( "Nix development shell" )
+fi
 
 # ft-cli check
 if command -v ft >/dev/null 2>&1; then
@@ -71,12 +76,34 @@ cd $TEMPLATE_DIR
 template_install
 cd $FTT_PWD
 
-[ $NIX_SHELL -eq 1 ] || rm -rf {shell,flake}.nix .envrc
+[ $NIX_SHELL -eq 1 ] || rm -f {shell,flake}.nix .envrc
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 [ $README_LICENSE -eq 1 ] || rm -rf LICENSE README.md
 [ $GENSOURCES -eq 1 ] && bash gensources.sh || rm -rf gensources.sh
 
 initialize_git
+
+# Check if the current system already has nix with flakes enabled, otherwise it's not worth it to have a flake
+if [ $NIX_SHELL -eq 1 ]; then 
+	if [ $FTT_USES_GIT -eq 1 ]; then
+		if ! nix flake 2>&1 | grep extra-experimental-features >/dev/null; then
+			warn "Locking nix flake, this could take a bit"
+			nix flake lock
+			if command -v qit >/dev/null 2>&1; then
+				qit commit deps -a flake.lock "init lockfile"
+			else
+				git commit -m "Init flake lockfile"
+			fi
+		else
+			warn "Nix flakes don't seem to be enabled, skipping flake generation"
+			rm -f flake.nix
+		fi
+	else
+		warn "Not using a git repository, skipping flake generation"
+		rm -f flake.nix
+	fi
+fi
+
 for lib in ${LIBRARIES[@]}; do add_library $lib; done
 if [ $FTT_USES_GIT -eq 1 ]; then
 	git submodule update --init --recursive
