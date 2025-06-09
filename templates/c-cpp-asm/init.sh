@@ -96,6 +96,7 @@ if [ $NIX_SHELL -eq 1 ]; then
 		if ! nix flake 2>&1 | grep extra-experimental-features >/dev/null; then
 			warn "Locking nix flake, this could take a bit"
 			nix flake lock
+			git add .
 			if command -v qit >/dev/null 2>&1; then
 				qit commit deps -a flake.lock "init lockfile"
 			else
