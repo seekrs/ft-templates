@@ -5,8 +5,9 @@
 function template_install_file() {
 	local file=$1
 	local dest=$FTT_PWD/$file
-	cat $file | mo > "$dest"
-	debug "Installed $file to $dest"
+  debug "Installing $file to $dest"
+	cat $file | mo > "$dest" || warn "Failed to install $file"
+	# debug "Installed $file to $dest"
 }
 
 function template_install() {

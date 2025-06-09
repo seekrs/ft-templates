@@ -2,6 +2,7 @@
 # https://github.com/seekrs/ft-templates
 
 NAME := {{PROJECT_NAME}}
+MAKE := make --no-print-directory --debug=none
 -include development.mk
 
 ifeq ($(DEVELOPMENT), 1)
@@ -57,7 +58,7 @@ LDFLAGS += -lSDL2
 {{/USE_MACROLIBX}}
 
 all:
-	$(MAKE) -j$(shell nproc) $(NAME)
+	@$(MAKE) -j$(shell nproc) $(NAME)
 
 $(NAME): $(OBJS) $(DEPFILES)
 	$(CC) $(LDFLAGS) -o $@ $^
@@ -99,6 +100,6 @@ compile_commands.json: oclean
 {{/CLANGD_SUPPORT}}
 
 re: fclean
-	$(MAKE) -j$(shell nproc) $(NAME)
+	@$(MAKE) -j$(shell nproc) $(NAME)
 
 .PHONY: all clean oclean fclean re

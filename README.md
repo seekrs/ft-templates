@@ -2,7 +2,7 @@
 
 This is a collection of free/libre templates for kickstarting your next 42 project.
 
-**Note:** this is not a never-write-a-makefile-again solution, learn how make works, it's not that hard.
+**Note:** this is ***not*** a never-write-a-makefile-again solution, learn how it works, it's not that hard.
 
 ## Usage
 

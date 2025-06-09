@@ -17,8 +17,8 @@
         (nixpkgs.lib.genAttrs systems (
           system:
           let
-            pkgs = import nixpkgs { 
-              inherit system; 
+            pkgs = import nixpkgs {
+              inherit system;
               # config.allowUnfree = true;
             };
           in

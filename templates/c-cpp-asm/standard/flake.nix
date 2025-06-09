@@ -14,13 +14,10 @@
       forAllSystems = nixpkgs.lib.genAttrs systems;
     in
     {
-      devShells = forAllSystems (
-        system:
-        {
-          default = (import ./shell.nix) {
-            pkgs = import nixpkgs { inherit system; };
-          };
-        }
-      );
+      devShells = forAllSystems (system: {
+        default = (import ./shell.nix) {
+          pkgs = import nixpkgs { inherit system; };
+        };
+      });
     };
 }

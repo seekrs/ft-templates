@@ -38,20 +38,24 @@ for lib in ${LIBRARIES[@]}; do
 	debug "lib='$lib'"
 done
 
+# If we want a variable to be "false" in mustache, we need to unset it
 [ $USE_LIBFT -eq 1 ] || unset USE_LIBFT
 [ $USE_MACROLIBX -eq 1 ] || unset USE_MACROLIBX
+[ $GENSOURCES -eq 1 ] || { export GENSOURCES_RM=1; unset GENSOURCES; }
+[ $CLANGD_SUPPORT -eq 1 ] || unset CLANGD_SUPPORT
 
 debug "LIBRARIES=$LIBRARIES"
 debug "LIBFT_URL=$libft_URL"
 debug "MacroLibX_URL=$MacroLibX_URL"
 
-ask_login FTLOGIN
+[[ $README_LICENSE -eq 1 ]] && ask_login FTLOGIN
 debug "FTLOGIN=$FTLOGIN"
 
 [ "x$(id -nu)" == "xkiroussa" ] && libft_LIB=build/output/libft.a
 [ "x$FTLOGIN" == "xkiroussa" ] && libft_LIB=build/output/libft.a
 
 YEAR=$(date +%Y)
+export PROJECT_ID=
 
 if [ $FTPROJECT_TOML -eq 1 ] || [ $README_LICENSE -eq 1 ]; then
 	require_fzf
@@ -79,10 +83,12 @@ cd $FTT_PWD
 [ $NIX_SHELL -eq 1 ] || rm -f {shell,flake}.nix .envrc
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 [ $README_LICENSE -eq 1 ] || rm -rf LICENSE README.md
-[ $GENSOURCES -eq 1 ] && bash gensources.sh || rm -rf gensources.sh
+bash gensources.sh
+[ $GENSOURCES_RM -eq 1 ] && rm -rf gensources.sh
 
 initialize_git
 
+#TODO: Move this to a runtime function
 # Check if the current system already has nix with flakes enabled, otherwise it's not worth it to have a flake
 if [ $NIX_SHELL -eq 1 ]; then 
 	if [ $FTT_USES_GIT -eq 1 ]; then
@@ -104,6 +110,7 @@ if [ $NIX_SHELL -eq 1 ]; then
 	fi
 fi
 
+#TODO: Move this to a runtime function
 for lib in ${LIBRARIES[@]}; do add_library $lib; done
 if [ $FTT_USES_GIT -eq 1 ]; then
 	git submodule update --init --recursive

@@ -1,4 +1,7 @@
-{ pkgs ? import <nixpkgs> {} }:
+{
+  pkgs ? import <nixpkgs> {}
+}:
+
 let
   stdenv = pkgs.llvmPackages_20.stdenv;
 in
@@ -19,5 +22,8 @@ in
     SDL2
     xorg.libX11
 {{/USE_MACROLIBX}}
+
+    # Put your nix packages here.
+    # Find some at https://search.nixos.org/packages
   ];
 }
