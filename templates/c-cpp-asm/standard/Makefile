@@ -38,7 +38,7 @@ endif
 
 include sources.mk
 
-OBJS := $(patsubst %.c,%.o,$(patsubst %.s,%.o,$(patsubst %.cpp,%.o,$(SRCS))))
+OBJS := $(patsubst %.c,%.o,$(patsubst %.S,%.o,$(patsubst %.s,%.o,$(patsubst %.cpp,%.o,$(SRCS)))))
 SRCS := $(addprefix $(SRC_DIR)/,$(SRCS))
 OBJS := $(addprefix $(OBJ_DIR)/,$(OBJS))
 
@@ -67,6 +67,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
+	@mkdir -p $(dir $@)
+	$(NASM) $(NASMFLAGS) $< -o $@
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.S
 	@mkdir -p $(dir $@)
 	$(NASM) $(NASMFLAGS) $< -o $@
 
