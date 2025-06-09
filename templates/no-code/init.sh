@@ -52,6 +52,13 @@ template_install
 cd $FTT_PWD
 
 [ $NIX_SHELL -eq 1 ] || rm -rf {shell,flake}.nix .envrc
+if [ $NIX_SHELL -eq 1 ]; then
+	if command -v direnv >/dev/null 2>&1; then
+		direnv allow
+	else
+		rm -f .envrc
+	fi
+fi
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 [ $README_LICENSE -eq 1 ] || rm -rf LICENSE README.md
 
