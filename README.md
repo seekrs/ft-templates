@@ -6,8 +6,6 @@ This is a collection of free/libre templates for kickstarting your next 42 proje
 
 ## Usage
 
-`TODO: unfinished`
-
 <!-- These templates can be used via [ft-cli](https://github.com/seekrs/ft-cli), using the `ft init` command. -->
 
 This repository also provides a standalone interactive script; just run the following command to get started:
@@ -16,7 +14,7 @@ This repository also provides a standalone interactive script; just run the foll
 bash <(curl -sSL init.seekrs.top)
 ```
 
-Some experimental/highly-specific templates aren't displayed by default, you can see them by running:
+Some experimental/highly-specific/broken templates aren't displayed by default, you can see them by running:
 
 ```sh
 FTT_SHOW_ALL=1 bash <(curl -sSL init.seekrs.top)
@@ -24,4 +22,4 @@ FTT_SHOW_ALL=1 bash <(curl -sSL init.seekrs.top)
 
 ## License
 
-This repository and all its contents are licensed under [the unlicense](./LICENSE).
+This repository and all its contents are licensed under [the Unlicense](./LICENSE).

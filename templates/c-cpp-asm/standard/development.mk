@@ -6,7 +6,7 @@
 # like automatic sources list generation, verbose output, debug
 # symbols, disabling -Werror, etc.
 #
-# It is ignored by git by default, make sure to manually
-# create it when re-cloning the project
+# It is ignored by git by default, make sure to manually create it
+# when re-cloning the project in a new development environment.
 
 DEVELOPMENT ?= 1

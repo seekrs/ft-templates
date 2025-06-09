@@ -1,6 +1,10 @@
 *.o
 *.a
+*.so
 *.out
 /{{PROJECT_NAME}}
-.direnv/
+/.direnv/
 *.swp
+/.cache/
+compile_commands.json
+

@@ -1,12 +1,16 @@
-text_input "Give a small prefix for project headers or namespace (e.g. ft):" resp
-PROJECT_PREFIX=$resp
+options=( "Add README & License" "Dependency: libft" "Dependency: MacroLibX" "Automatic sources generation" "clangd support" "Nix development shell" )
 
-options=( "Add README & License" "Use libft" "Use MacroLibX" "Automatic sources generation" "Nix development shell" "ftproject.toml" )
+# ft-cli check
+if command -v ft >/dev/null 2>&1; then
+	options+=( "ftproject.toml" )
+fi
+
 checkbox_input "Select which features you want to use:" options resp
 
 README_LICENSE=$(opts_has resp "Add README & License")
-USE_LIBFT=$(opts_has resp "Use libft")
-USE_MACROLIBX=$(opts_has resp "Use MacroLibX")
+USE_LIBFT=$(opts_has resp "Dependency: libft")
+USE_MACROLIBX=$(opts_has resp "Dependency: MacroLibX")
+CLANGD_SUPPORT=$(opts_has resp "clangd support")
 TEMPLATE_DIR=standard
 # [[ $(opts_has resp "Mandatory/Common/Bonus sources split" >/dev/null) == "1" ]] && TEMPLATE_DIR=bonus-split
 GENSOURCES=$(opts_has resp "Automatic sources generation")
@@ -23,7 +27,6 @@ debug "NIX_SHELL=$NIX_SHELL"
 
 LIBRARIES=()
 [ $USE_LIBFT -eq 1 ] && LIBRARIES+=("libft") && ask_libft_url libft_URL && libft_LIB=libft.a && log "Added libft"
-[ "x$(id -nu)" == "xkiroussa" ] && libft_LIB=build/output/libft.a
 [ $USE_MACROLIBX -eq 1 ] && LIBRARIES+=("MacroLibX") && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
 debug "LIBRARIES=$LIBRARIES"
 for lib in ${LIBRARIES[@]}; do
@@ -40,6 +43,9 @@ debug "MacroLibX_URL=$MacroLibX_URL"
 ask_login FTLOGIN
 debug "FTLOGIN=$FTLOGIN"
 
+[ "x$(id -nu)" == "xkiroussa" ] && libft_LIB=build/output/libft.a
+[ "x$FTLOGIN" == "xkiroussa" ] && libft_LIB=build/output/libft.a
+
 YEAR=$(date +%Y)
 
 if [ $FTPROJECT_TOML -eq 1 ] || [ $README_LICENSE -eq 1 ]; then
@@ -48,7 +54,7 @@ if [ $FTPROJECT_TOML -eq 1 ] || [ $README_LICENSE -eq 1 ]; then
 
 	JSON_FILE=$RUNTIME_DIR/runtime/data/projects.json
 	#TODO: try and fetch json into cache first
-	#[ ! -f $JSON_FILE && require_ft_cli ] && mkdir -p $(dirname $JSON_FILE) && ft projects --all --json > $RUNTIME_DIR/runtime/data/projects.json
+	#[ ! -f $JSON_FILE && require_ft_cli ] && mkdir -p $(dirname $JSON_FILE) && ft projects --all --format=json > $RUNTIME_DIR/runtime/data/projects.json
 
 	if [ ! -f $JSON_FILE ]; then
 		if [ $FTPROJECT_TOML -eq 1 ]; then
@@ -65,10 +71,10 @@ cd $TEMPLATE_DIR
 template_install
 cd $FTT_PWD
 
-[ $GENSOURCES -eq 1 ] && bash gensources.sh || rm -rf gensources.sh
 [ $NIX_SHELL -eq 1 ] || rm -rf {shell,flake}.nix .envrc
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 [ $README_LICENSE -eq 1 ] || rm -rf LICENSE README.md
+[ $GENSOURCES -eq 1 ] && bash gensources.sh || rm -rf gensources.sh
 
 initialize_git
 for lib in ${LIBRARIES[@]}; do add_library $lib; done

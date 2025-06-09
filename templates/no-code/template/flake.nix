@@ -10,16 +10,26 @@
     { self, nixpkgs, ... }@inputs:
     let
       inherit (self) outputs;
+
       systems = (import inputs.systems);
-      forAllSystems = nixpkgs.lib.genAttrs systems;
+      forAllSystems =
+        fn:
+        (nixpkgs.lib.genAttrs systems (
+          system:
+          let
+            pkgs = import nixpkgs { 
+              inherit system; 
+              # config.allowUnfree = true;
+            };
+          in
+          fn system pkgs
+        ));
     in
     {
+      formatter = forAllSystems (system: pkgs: pkgs.nixfmt-rfc-style);
       devShells = forAllSystems (
-        system:
-        {
-          default = (import ./shell.nix) {
-            pkgs = import nixpkgs { inherit system; };
-          };
+        system: pkgs: {
+          default = (import ./shell.nix) { inherit pkgs; };
         }
       );
     };

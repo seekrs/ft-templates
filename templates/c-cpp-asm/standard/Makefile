@@ -6,6 +6,7 @@ NAME := {{PROJECT_NAME}}
 
 ifeq ($(DEVELOPMENT), 1)
 DEBUG := 1
+USE_WARNINGS := 1
 {{#GENSOURCES}}
 _ := $(shell bash gensources.sh sources.mk $(SRC_DIR))
 {{/GENSOURCES}}
@@ -15,7 +16,12 @@ DEBUG ?= 0
 BONUS ?= 0
 
 CC := clang
-CFLAGS := -Wall -Wextra -Werror
+CXX := clang++
+CFLAGS := -Wall -Wextra
+ifneq ($(USE_WARNINGS), 1)
+CFLAGS += -Werror
+endif
+CXXFLAGS := $(CFLAGS)
 LDFLAGS :=
 
 NASM := nasm
@@ -50,7 +56,8 @@ DEPFILES += $({{.}}_DEP)
 LDFLAGS += -lSDL2
 {{/USE_MACROLIBX}}
 
-all: $(NAME)
+all:
+	$(MAKE) -j$(shell nproc) $(NAME)
 
 $(NAME): $(OBJS) $(DEPFILES)
 	$(CC) $(LDFLAGS) -o $@ $^
@@ -65,7 +72,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.s
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 {{#LIBRARIES}}
 
 $({{.}}_DEP):
@@ -85,7 +92,13 @@ fclean: oclean
 	make -C $({{.}}_DIR) fclean
 {{/LIBRARIES}}
 	rm -rf $(NAME)
+{{#CLANGD_SUPPORT}}
 
-re: fclean all
+compile_commands.json: oclean
+	bear -- $(MAKE) USE_WARNINGS=1 $(OBJS) 
+{{/CLANGD_SUPPORT}}
+
+re: fclean
+	$(MAKE) -j$(shell nproc) $(NAME)
 
 .PHONY: all clean oclean fclean re
