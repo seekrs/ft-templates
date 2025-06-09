@@ -41,6 +41,7 @@ done
 # If we want a variable to be "false" in mustache, we need to unset it
 [ $USE_LIBFT -eq 1 ] || unset USE_LIBFT
 [ $USE_MACROLIBX -eq 1 ] || unset USE_MACROLIBX
+export GENSOURCES_RM=0
 [ $GENSOURCES -eq 1 ] || { export GENSOURCES_RM=1; unset GENSOURCES; }
 [ $CLANGD_SUPPORT -eq 1 ] || unset CLANGD_SUPPORT
 
