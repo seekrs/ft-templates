@@ -2,7 +2,7 @@
   description = "{{PROJECT_NAME}}";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
     systems.url = "github:nix-systems/x86_64-linux";
   };
 
