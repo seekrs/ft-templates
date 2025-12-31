@@ -3,7 +3,7 @@
 }:
 
 let
-  stdenv = pkgs.llvmPackages_20.stdenv;
+  stdenv = pkgs.llvmPackages_21.stdenv;
 in
 (pkgs.mkShell.override { inherit stdenv; }) {
   nativeBuildInputs = with pkgs; [
