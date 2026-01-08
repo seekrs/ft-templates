@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixpkgs-unstable";
-    systems.url = "github:nix-systems/x86_64-linux";
   };
 
   outputs =
@@ -11,26 +10,16 @@
     let
       inherit (self) outputs;
 
-      systems = (import inputs.systems);
       forAllSystems =
-        fn:
-        (nixpkgs.lib.genAttrs systems (
-          system:
-          let
-            pkgs = import nixpkgs {
-              inherit system;
-              # config.allowUnfree = true;
-            };
-          in
-          fn system pkgs
-        ));
+        function:
+        nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed (
+          system: function nixpkgs.legacyPackages.${system}
+        );
     in
     {
-      formatter = forAllSystems (system: pkgs: pkgs.nixfmt-rfc-style);
-      devShells = forAllSystems (
-        system: pkgs: {
-          default = (import ./shell.nix) { inherit pkgs; };
-        }
-      );
+      formatter = forAllSystems (pkgs: pkgs.nixfmt-rfc-style);
+      devShells = forAllSystems (pkgs: {
+        default = (import ./shell.nix) { inherit pkgs; };
+      });
     };
 }
