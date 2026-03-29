@@ -10,11 +10,22 @@ if command -v ft >/dev/null 2>&1; then
 	options+=( "ftproject.toml" )
 fi
 
+# kiroussa moment
+if [[ $(id -nu) == "kiroussa" ]] || [ -f $HOME/.config/ft-templates/hi-im-kroussar ]; then
+	options+=( "Dependency: libftstd" )
+	options+=( "Dependency: libkroussar" )
+fi
+
+# sort options alphabetically
+mapfile -t options < <(printf '%s\n' "${options[@]}" | sort)
+
 checkbox_input "Select which features you want to use:" options resp
 
 README_LICENSE=$(opts_has resp "Add README & License")
 USE_LIBFT=$(opts_has resp "Dependency: libft")
 USE_MACROLIBX=$(opts_has resp "Dependency: MacroLibX")
+USE_LIBFTSTD=$(opts_has resp "Dependency: libftstd")
+USE_LIBKROUSSAR=$(opts_has resp "Dependency: libkroussar")
 CLANGD_SUPPORT=$(opts_has resp "clangd support")
 TEMPLATE_DIR=standard
 # [[ $(opts_has resp "Mandatory/Common/Bonus sources split" >/dev/null) == "1" ]] && TEMPLATE_DIR=bonus-split
@@ -25,6 +36,8 @@ NIX_SHELL="$(opts_has resp "Nix development shell")"
 debug "README_LICENSE=$README_LICENSE"
 debug "USE_LIBFT=$USE_LIBFT"
 debug "USE_MACROLIBX=$USE_MACROLIBX"
+debug "USE_LIBFTSTD=$USE_LIBFTSTD"
+debug "USE_LIBKROUSSAR=$USE_LIBKROUSSAR"
 debug "TEMPLATE_DIR=$TEMPLATE_DIR"
 debug "GENSOURCES=$GENSOURCES"
 debug "FTPROJECT_TOML=$FTPROJECT_TOML"
@@ -32,17 +45,26 @@ debug "NIX_SHELL=$NIX_SHELL"
 
 LIBRARIES=()
 [ $USE_LIBFT -eq 1 ] && LIBRARIES+=("libft") && ask_libft_url libft_URL && libft_LIB=libft.a && log "Added libft"
-[ $USE_MACROLIBX -eq 1 ] && LIBRARIES+=("MacroLibX") && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && log "Added MLX"
+[ $USE_MACROLIBX -eq 1 ] && LIBRARIES+=("MacroLibX") && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && MacroLibX_INCDIR=includes && log "Added MLX"
+[ $USE_LIBFTSTD -eq 1 ] && LIBRARIES+=("libftstd") && libftstd_URL=${LIBFTSTD_URL:-"https://codeberg.org/27/libftstd.git"} && libftstd_LIB=libftstd.a && log "Added libftstd"
+[ $USE_LIBKROUSSAR -eq 1 ] && LIBRARIES+=("libkroussar") && libkroussar_URL=${LIBKROUSSAR_URL:-"https://codeberg.org/27/libkroussar.git"} && libkroussar_LIB=libkroussar.a && log "Added libkroussar"
 debug "LIBRARIES=$LIBRARIES"
 for lib in ${LIBRARIES[@]}; do
+	# if $lib_INCDIR is not set, set it to "include"
+	incdir_var="${lib}_INCDIR"
+	if [ -z "${!incdir_var}" ]; then
+		export ${incdir_var}=include
+	fi
 	debug "lib='$lib'"
+	debug "lib_INCDIR='${!incdir_var}'"
 done
 
 # If we want a variable to be "false" in mustache, we need to unset it
 [ $USE_LIBFT -eq 1 ] || unset USE_LIBFT
 [ $USE_MACROLIBX -eq 1 ] || unset USE_MACROLIBX
-export GENSOURCES_RM=0
-[ $GENSOURCES -eq 1 ] || { export GENSOURCES_RM=1; unset GENSOURCES; }
+[ $USE_LIBFTSTD -eq 1 ] || unset USE_LIBFTSTD
+[ $USE_LIBKROUSSAR -eq 1 ] || unset USE_LIBKROUSSAR
+[ $GENSOURCES -eq 1 ] || unset GENSOURCES;
 [ $CLANGD_SUPPORT -eq 1 ] || unset CLANGD_SUPPORT
 
 debug "LIBRARIES=$LIBRARIES"
@@ -84,8 +106,6 @@ cd $FTT_PWD
 [ $NIX_SHELL -eq 1 ] || rm -f {shell,flake}.nix .envrc
 [ $FTPROJECT_TOML -eq 1 ] && write_ftproject 
 [ $README_LICENSE -eq 1 ] || rm -rf LICENSE README.md
-bash gensources.sh
-[ $GENSOURCES_RM -eq 1 ] && rm -rf gensources.sh
 
 initialize_git
 

@@ -5,11 +5,15 @@ NAME := {{PROJECT_NAME}}
 MAKE := make --no-print-directory --debug=none
 -include development.mk
 
+SRC_DIR := src
+BUILD_DIR := build
+OBJ_DIR := $(BUILD_DIR)/obj
+
 ifeq ($(DEVELOPMENT), 1)
 DEBUG := 1
 USE_WARNINGS := 1
 {{#GENSOURCES}}
-_ := $(shell bash gensources.sh sources.mk $(SRC_DIR))
+_ := $(shell find $(SRC_DIR)/ -type f \( -name '*.c' -o -name '*.cpp' -o -name '*.s' -o -name '*.S' \) | LC_ALL=C sort | sed 's/^src\//SRCS += /' > sources.mk)
 {{/GENSOURCES}}
 endif
 
@@ -26,10 +30,6 @@ LDFLAGS :=
 
 NASM := nasm
 NASMFLAGS := -f elf64
-
-SRC_DIR := src
-BUILD_DIR := build
-OBJ_DIR := $(BUILD_DIR)/obj
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g3 -gdwarf-3 -ggdb

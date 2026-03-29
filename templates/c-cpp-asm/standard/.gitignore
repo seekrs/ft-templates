@@ -1,10 +1,13 @@
 *.o
 *.a
+*.d
 *.so
 *.out
 /{{PROJECT_NAME}}
+/development.mk
 /.direnv/
 *.swp
 /.cache/
 compile_commands.json
-
+vgcore.*
+core.*
