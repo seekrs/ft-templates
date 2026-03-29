@@ -46,7 +46,7 @@ debug "NIX_SHELL=$NIX_SHELL"
 LIBRARIES=()
 [ $USE_LIBFT -eq 1 ] && LIBRARIES+=("libft") && ask_libft_url libft_URL && libft_LIB=libft.a && log "Added libft"
 [ $USE_MACROLIBX -eq 1 ] && LIBRARIES+=("MacroLibX") && MacroLibX_URL=${MACROLIBX_URL:-"https://github.com/seekrs/MacroLibX.git"} && MacroLibX_LIB=libmlx.so && MacroLibX_INCDIR=includes && log "Added MLX"
-[ $USE_LIBFTSTD -eq 1 ] && LIBRARIES+=("libftstd") && libftstd_URL=${LIBFTSTD_URL:-"https://codeberg.org/27/libftstd.git"} && libftstd_LIB=libftstd.a && log "Added libftstd"
+[ $USE_LIBFTSTD -eq 1 ] && LIBRARIES+=("libftstd") && libftstd_URL=${LIBFTSTD_URL:-"https://codeberg.org/27/libftstd.git"} && libftstd_LIB=libftstd.a libftstd_INCDIR=__ignored && log "Added libftstd"
 [ $USE_LIBKROUSSAR -eq 1 ] && LIBRARIES+=("libkroussar") && libkroussar_URL=${LIBKROUSSAR_URL:-"https://codeberg.org/27/libkroussar.git"} && libkroussar_LIB=libkroussar.a && log "Added libkroussar"
 debug "LIBRARIES=$LIBRARIES"
 for lib in ${LIBRARIES[@]}; do

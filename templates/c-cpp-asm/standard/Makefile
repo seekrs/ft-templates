@@ -48,7 +48,7 @@ LIBRARIES += {{.}}
 {{.}}_URL := {{(. '_URL')}}
 {{.}}_DIR := $(LIB_DIR)/{{.}}
 {{.}}_DEP := $({{.}}_DIR)/{{(. '_LIB')}}
-CFLAGS += -I$({{.}}_DIR)/include -I$({{.}}_DIR)/includes
+CFLAGS += -I$({{.}}_DIR)/{{(. '_INCDIR')}}
 LDFLAGS += $({{.}}_DEP)
 DEPFILES += $({{.}}_DEP)
 {{/LIBRARIES}}
