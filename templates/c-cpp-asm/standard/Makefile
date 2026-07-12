@@ -6,6 +6,7 @@ MAKE := make --no-print-directory --debug=none
 -include development.mk
 
 SRC_DIR := src
+INCLUDE_DIR := include
 BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 
@@ -21,12 +22,13 @@ DEBUG ?= 0
 
 CC := clang
 CXX := clang++
-CFLAGS := -Wall -Wextra
+CFLAGS := -Wall -Wextra -I$(INCLUDE_DIR) -march=native -mtune=native -flto
 ifneq ($(USE_WARNINGS), 1)
 CFLAGS += -Werror
 endif
-CXXFLAGS := $(CFLAGS)
-LDFLAGS :=
+CXXFLAGS := $(CFLAGS) -std=c++23
+CFLAGS += -std=c23
+LDFLAGS := -flto
 
 NASM := nasm
 NASMFLAGS := -f elf64
@@ -49,13 +51,14 @@ LIBRARIES += {{.}}
 {{.}}_DIR := $(LIB_DIR)/{{.}}
 {{.}}_DEP := $({{.}}_DIR)/{{(. '_LIB')}}
 CFLAGS += -I$({{.}}_DIR)/{{(. '_INCDIR')}}
-LDFLAGS += $({{.}}_DEP)
 DEPFILES += $({{.}}_DEP)
 {{/LIBRARIES}}
+
 {{#USE_MACROLIBX}}
-LDFLAGS += -lSDL2
+LDFLAGS += -lSDL2 -lm
 {{/USE_MACROLIBX}}
 
+.PHONY: all
 all:
 	@$(MAKE) -j$(shell nproc) $(NAME)
 
@@ -83,14 +86,20 @@ $({{.}}_DEP):
 	make -C $({{.}}_DIR) -j$(shell nproc)
 {{/LIBRARIES}}
 
+.PHONY: fclean
 oclean:
 	rm -rf $(BUILD_DIR)
 
+.PHONY: remake
+remake: oclean all
+
+.PHONY: clean
 clean: oclean
 {{#LIBRARIES}}
 	make -C $({{.}}_DIR) clean
 {{/LIBRARIES}}
 
+.PHONY: fclean
 fclean: oclean
 {{#LIBRARIES}}
 	make -C $({{.}}_DIR) fclean
@@ -98,11 +107,11 @@ fclean: oclean
 	rm -rf $(NAME)
 {{#CLANGD_SUPPORT}}
 
+.PHONY: compile_commands.json
 compile_commands.json: oclean
 	bear -- $(MAKE) USE_WARNINGS=1 $(OBJS) 
 {{/CLANGD_SUPPORT}}
 
+.PHONY: re
 re: fclean
 	@$(MAKE) -j$(shell nproc) $(NAME)
-
-.PHONY: all clean oclean fclean re
