@@ -19,7 +19,16 @@
     {
       formatter = forAllSystems (pkgs: pkgs.nixfmt);
       devShells = forAllSystems (pkgs: {
-        default = (import ./shell.nix) { inherit pkgs; };
+        default = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [
+            (python314.withPackages (p: with p; [
+              setuptools
+              wheel
+              virtualenv
+              uv
+            ]))
+          ];
+        };
       });
     };
 }

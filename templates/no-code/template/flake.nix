@@ -19,7 +19,12 @@
     {
       formatter = forAllSystems (pkgs: pkgs.nixfmt);
       devShells = forAllSystems (pkgs: {
-        default = (import ./shell.nix) { inherit pkgs; };
+        default = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [
+            # Put your nix packages here.
+            # Find some at https://search.nixos.org/packages
+          ];
+        };
       });
     };
 }
