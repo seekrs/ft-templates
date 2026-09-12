@@ -21,7 +21,7 @@
       devShells = forAllSystems (pkgs: {
         default =
           let
-            stdenv = pkgs.stdenvAdapters.useMoldLinker pkgs.llvmPackages_22.stdenv;
+            stdenv = pkgs.stdenvAdapters.useMoldLinker pkgs.llvmPackages_23.stdenv;
           in
           (pkgs.mkShell.override { inherit stdenv; }) {
             nativeBuildInputs = with pkgs; [
