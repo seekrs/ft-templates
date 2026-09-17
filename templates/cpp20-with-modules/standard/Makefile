@@ -79,10 +79,10 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(PCMS_MODULES)
 
 .PHONY: fclean
 oclean:
-	@mv $(STD_PCM) /tmp/std.pcm
+	@mv $(STD_PCM) /tmp/std.pcm 2>/dev/null || true
 	rm -rf $(BUILD_DIR)
-	@mkdir -p $(MODULES_DIR)
-	@mv /tmp/std.pcm $(STD_PCM)
+	@[ -f /tmp/std.pcm ] && mkdir -p $(MODULES_DIR) || true
+	@mv /tmp/std.pcm $(STD_PCM) 2>/dev/null || true
 
 .PHONY: remake
 remake: oclean all
