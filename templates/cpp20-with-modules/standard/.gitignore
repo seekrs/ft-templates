@@ -3,6 +3,8 @@
 *.d
 *.so
 *.out
+*.pcm
+/build/
 /{{PROJECT_NAME}}
 /development.mk
 /.direnv/
